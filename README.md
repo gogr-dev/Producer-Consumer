@@ -74,23 +74,6 @@ java -cp out pc.ProducerConsumer --help
 The original positional form still works: `java pc.ProducerConsumer 20 10 5`
 (`seconds producers consumers`).
 
-## What it does differently from the original
-
-- **Four implementations behind one `Buffer` interface**, selectable with `--impl`.
-- **Graceful shutdown.** The original called `System.exit(0)`, hard-killing threads
-  mid-operation. This version runs on an `ExecutorService`, and when time is up it
-  interrupts the workers (unblocking any thread parked in `put`/`take`) so they exit
-  cleanly, then prints a summary.
-- **Conservation check.** The summary verifies `produced == consumed + items left in
-  buffer`, so a bug that loses or duplicates items would show up immediately.
-- **Time-bounded, not fixed-count.** Producers/consumers run for the configured duration
-  instead of a hard-coded 100 iterations each — which also removes a latent deadlock when
-  the producer and consumer counts differ.
-- **Correctness test** (`make test`) that pushes 200,000 distinct items through every
-  implementation and asserts each is consumed exactly once, with a deadlock watchdog.
-- **Configurable** capacity and sleep, **named threads** in the logs, input validation,
-  and a `--help` screen.
-
 ## Example
 
 ```
